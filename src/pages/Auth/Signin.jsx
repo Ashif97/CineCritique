@@ -1,14 +1,17 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 import { baseurl } from '../../baseurl/baseurl';
+import { setUser } from '../../userSlice'; // Adjust the import path as necessary
 
 export default function SignIn() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
   const navigate = useNavigate();
-  const [isAdmin, setIsAdmin] = useState(false); // State to store admin status
+  const dispatch = useDispatch();
 
   const handleSignIn = async (e) => {
     e.preventDefault();
@@ -20,33 +23,14 @@ export default function SignIn() {
 
       // Set cookie with token, expires in 1 day
       Cookies.set('token', response.data.token, { expires: 1 });
-
-      // Redirect to determine role and redirect accordingly
-      fetchUserRoleAndRedirect();
-    } catch (error) {
-      console.error('Error signing in', error);
-      // Handle error (e.g., show error message)
-    }
-  };
-
-  const fetchUserRoleAndRedirect = async () => {
-    try {
-      const token = Cookies.get('token');
-      if (!token) {
-        // Handle case where token is not found (e.g., redirect to login)
-        return;
-      }
-
-      const config = {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      };
-
-      const response = await axios.get(`${baseurl}/api/admin/users`, config);
       const userRole = response.data.role;
+      const userName = response.data.username;
+      const userID = response.data.userId;
 
-      setIsAdmin(userRole === 'admin');
+      // Dispatch the setUser action
+      dispatch(setUser({ id: userID, role: userRole, name: userName }));
+
+      console.log('User role:', userRole, 'User name:', userName, 'User id:', userID);
 
       // Redirect based on role
       if (userRole === 'admin') {
@@ -55,8 +39,18 @@ export default function SignIn() {
         navigate('/home');
       }
     } catch (error) {
-      console.error('Error fetching user role', error);
-      // Handle error (e.g., show error message)
+      if (error.response) {
+        if (error.response.status === 404) {
+          setErrorMessage('User not found');
+        } else if (error.response.status === 401) {
+          setErrorMessage('Wrong password');
+        } else {
+          setErrorMessage('Error signing in');
+        }
+      } else {
+        setErrorMessage('Error signing in');
+      }
+      console.error('Error signing in', error);
     }
   };
 
@@ -64,6 +58,7 @@ export default function SignIn() {
     <div className="min-h-screen flex items-center justify-center">
       <form onSubmit={handleSignIn} className="w-1/3 bg-white p-8 rounded shadow-md">
         <h2 className="text-2xl mb-6">Sign In</h2>
+        {errorMessage && <p className="mb-4 text-red-500">{errorMessage}</p>}
         <div className="mb-4">
           <label className="block text-gray-700 text-sm font-bold mb-2">Email</label>
           <input

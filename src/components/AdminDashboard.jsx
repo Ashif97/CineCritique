@@ -85,11 +85,11 @@ const AdminDashboard = () => {
         <h2 className="text-2xl font-bold bg-blue-100 p-2 rounded-md text-gray-900">Total Movies: {totalMovies}</h2>
       </div>
       <div className="mb-4">
-        <h2 className="text-2xl font-bold bg-blue-100 p-2 rounded-md text-gray-900">Recent Users:</h2>
+        <h2 className="text-2xl font-bold bg-blue-100 p-2 rounded-md text-gray-900">Recently Joined Users:</h2>
         <ul className="list-disc list-inside text-lg font-semibold">{recentUsers}</ul>
       </div>
       <div className="mb-4">
-        <h2 className="text-2xl font-bold bg-blue-100 p-2 rounded-md text-gray-900">Recent Movies:</h2>
+        <h2 className="text-2xl font-bold bg-blue-100 p-2 rounded-md text-gray-900">Recently Added Movies:</h2>
         <ul className="list-disc list-inside text-lg font-semibold">{recentMovies}</ul>
       </div>
     </div>

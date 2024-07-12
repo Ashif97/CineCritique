@@ -44,7 +44,7 @@ const AdminPage = () => {
     const movieData = {
       title,
       description,
-      releaseDate,
+      releaseDate,  
       image,
       genres: [selectedGenre],
       topCast: castMembers.map(member => `${member.name} (${member.role})`),

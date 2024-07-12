@@ -1,42 +1,47 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { useSelector } from 'react-redux';
+import { baseurl } from '../baseurl/baseurl';
+
 
 const Reviews = ({ movieId }) => {
   const [reviews, setReviews] = useState([]);
   const [error, setError] = useState(null);
   const [newReview, setNewReview] = useState('');
   const [rating, setRating] = useState(1);
+  const user = useSelector((state) => state.user); // Accessing Redux state
+
+  const fetchReviews = async () => {
+    try {
+      const response = await axios.get(`${baseurl}/api/reviews/${movieId}`);
+      const { reviews } = response.data;
+      setReviews(reviews);
+    } catch (err) {
+      setError(err.response?.data?.message || 'An error occurred while fetching reviews');
+    }
+  };
 
   useEffect(() => {
-    const fetchReviews = async () => {
-      try {
-        const response = await axios.get(`https://moviereview-be.onrender.com/api/reviews/${movieId}`);
-        
-        const { reviews, averageRating } = response.data;
-        setReviews(reviews);
-        
-      } catch (err) {
-        setError(err.response?.data?.message || 'An error occurred while fetching reviews');
-      }
-    };
-
     fetchReviews();
   }, [movieId]);
 
   const handleReviewSubmit = async () => {
-    const userId = 'yourUserId'; 
+    if (!user.id) {
+      setError('User ID not found');
+      return;
+    }
+
     try {
-      const response = await axios.post(`${baseurl}/api/reviews`, {
-        userId,
+      await axios.post(`${baseurl}/api/reviews`, {
+        userId: user.id,
         movieId,
         rating,
         reviewText: newReview,
       });
 
-      // Assuming response.data contains the new review
-      setReviews((prevReviews) => [...prevReviews, response.data]);
       setNewReview('');
       setRating(1);
+      fetchReviews(); // Refetch reviews
     } catch (err) {
       setError(err.response?.data?.message || 'An error occurred while submitting the review');
     }
@@ -52,9 +57,13 @@ const Reviews = ({ movieId }) => {
       {reviews.map((review) => (
         <div key={review._id} className="flex space-x-4 items-center">
           <div>
-            <p className="font-semibold">{review.user.username}</p>
-            <p className="text-gray-500">Review:"{review.reviewText}"</p>
-            <p className="text-yellow-400">Rating: {review.rating}/10</p>
+            {review.user && (
+              <>
+                <p className="font-semibold">{review.user.username}</p>
+                <p className="text-gray-500">Review: "{review.reviewText}"</p>
+                <p className="text-yellow-400">Rating: {review.rating}/10</p>
+              </>
+            )}
           </div>
         </div>
       ))}

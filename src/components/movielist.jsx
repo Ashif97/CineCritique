@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { baseurl } from '../baseurl/baseurl';
 
@@ -12,12 +12,14 @@ const MovieList = ({ isAdmin }) => {
   const [selectedRatingCategory, setSelectedRatingCategory] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
+  const location = useLocation();
+  const disableLinks = location.pathname === '/admin'; // Replace '/some-page' with the actual path
 
   const ratingCategories = [
     { label: 'All Ratings', value: '' },
-    { label: 'High Rated  ', value: '8-10' },
-    { label: 'Average Rated ', value: '5-7.9' },
-    { label: 'Low Rated ', value: '1-4.9' },
+    { label: 'High Rated', value: '8-10' },
+    { label: 'Average Rated', value: '5-7.9' },
+    { label: 'Low Rated', value: '1-4.9' },
     // { label: 'Unrated', value: '0' } // Adjusted 'Unrated' value to '0' to match backend logic
   ];
 
@@ -158,25 +160,47 @@ const MovieList = ({ isAdmin }) => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {movies.map(movie => (
             <div key={movie._id} className="border rounded-lg shadow-md overflow-hidden">
-              <Link to={`/movie/${movie._id}`}>
-                <img
-                  src={movie.image}
-                  alt={movie.title}
-                  className="w-full h-48 object-cover"
-                />
-                <div className="p-4">
-                  <h2 className="text-xl font-bold mb-2">{movie.title}</h2>
-                  <p className="text-gray-700 mb-4 line-clamp-3">{movie.description}</p>
-                  <div className="text-sm text-gray-600">
-                    <p><span className="font-semibold">Release:</span> {new Date(movie.releaseDate).toLocaleDateString()}</p>
-                    <p><span className="font-semibold">Genre:</span> {movie.genres.join(', ')}</p>
-                    <p><span className="font-semibold">Cast:</span> {movie.topCast.join(', ')}</p>
-                    <p>
-                      <span className="font-semibold">Rating:</span> {movie.averageRating !== undefined ? movie.averageRating : 'Unrated'}
-                    </p>
+              {disableLinks ? (
+                <div>
+                  <img
+                    src={movie.image}
+                    alt={movie.title}
+                    className="w-full h-48 object-cover"
+                  />
+                  <div className="p-4">
+                    <h2 className="text-xl font-bold mb-2">{movie.title}</h2>
+                    <p className="text-gray-700 mb-4 line-clamp-3">{movie.description}</p>
+                    <div className="text-sm text-gray-600">
+                      <p><span className="font-semibold">Release:</span> {new Date(movie.releaseDate).toLocaleDateString()}</p>
+                      <p><span className="font-semibold">Genre:</span> {movie.genres.join(', ')}</p>
+                      <p><span className="font-semibold">Cast:</span> {movie.topCast.join(', ')}</p>
+                      <p>
+                        <span className="font-semibold">Rating:</span> {movie.averageRating !== undefined ? movie.averageRating : 'Unrated'}
+                      </p>
+                    </div>
                   </div>
                 </div>
-              </Link>
+              ) : (
+                <Link to={`/movie/${movie._id}`}>
+                  <img
+                    src={movie.image}
+                    alt={movie.title}
+                    className="w-full h-48 object-cover"
+                  />
+                  <div className="p-4">
+                    <h2 className="text-xl font-bold mb-2">{movie.title}</h2>
+                    <p className="text-gray-700 mb-4 line-clamp-3">{movie.description}</p>
+                    <div className="text-sm text-gray-600">
+                      <p><span className="font-semibold">Release:</span> {new Date(movie.releaseDate).toLocaleDateString()}</p>
+                      <p><span className="font-semibold">Genre:</span> {movie.genres.join(', ')}</p>
+                      <p><span className="font-semibold">Cast:</span> {movie.topCast.join(', ')}</p>
+                      <p>
+                        <span className="font-semibold">Rating:</span> {movie.averageRating !== undefined ? movie.averageRating : 'Unrated'}
+                      </p>
+                    </div>
+                  </div>
+                </Link>
+              )}
               {isAdmin && (
                 <button 
                   onClick={() => handleDelete(movie._id)}
