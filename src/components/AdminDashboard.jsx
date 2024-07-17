@@ -50,14 +50,13 @@ const AdminDashboard = () => {
   const totalUsers = users.length;
   const totalMovies = movies.length;
 
-  const recentUsers = users.slice(-5).map(user => (
+  const recentUsers = users.slice(-5).reverse().map(user => (
     <li key={user._id}>{user.username}</li>
   ));
 
-  const recentMovies = movies.slice(-5).map(movie => (
+  const recentMovies = movies.slice(0,5).map(movie => (
     <li key={movie._id}>{movie.title}</li>
   ));
-
   const chartData = {
     labels: movies.map(movie => movie.title),
     datasets: [
@@ -69,6 +68,19 @@ const AdminDashboard = () => {
         borderWidth: 1,
       },
     ],
+  };
+  
+  const chartOptions = {
+    maintainAspectRatio: false,
+    scales: {
+      y: {
+        beginAtZero: true, // Start y-axis at 0
+        ticks: {
+          stepSize: 1, // Display integer values only
+          precision: 0, // Disable fractional ticks
+        },
+      },
+    },
   };
 
   return (

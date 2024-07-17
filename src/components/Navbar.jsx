@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
-import { useSelector } from 'react-redux'; // Import useSelector
+import { useSelector } from 'react-redux';
 import { baseurl } from '../baseurl/baseurl';
 
 export default function Navbar({ onSearch }) {
@@ -14,11 +14,10 @@ export default function Navbar({ onSearch }) {
   const [toggleState, setToggleState] = useState(() => {
     return JSON.parse(localStorage.getItem('toggleState')) || false;
   });
-  const user = useSelector((state) => state.user); // Get user from Redux state
+  const user = useSelector((state) => state.user);
 
   useEffect(() => {
-    // Update the visibility based on the current route
-    const hiddenRoutes = ['/admin']; // Add the routes where you want to hide the elements
+    const hiddenRoutes = ['/admin'];
     setShowElements(!hiddenRoutes.includes(location.pathname));
     setDisableHomeLink(hiddenRoutes.includes(location.pathname));
   }, [location.pathname]);
@@ -124,7 +123,7 @@ export default function Navbar({ onSearch }) {
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
           </label>
           <div className="flex items-center gap-2">
-            <span>{user?.name}</span> {/* Display the user's name */}
+            <span>{user?.name}</span>
             <div className="dropdown dropdown-end">
               <div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar">
                 <div className="w-10 rounded-full">
@@ -132,6 +131,9 @@ export default function Navbar({ onSearch }) {
                 </div>
               </div>
               <ul tabIndex={0} className="mt-3 z-[1] p-2 shadow menu menu-sm dropdown-content bg-base-100 rounded-box w-52">
+                {user.role !== 'admin' && (
+                  <li><a onClick={() => navigate('/profile')}>Profile</a></li>
+                )}
                 <li><a onClick={handleLogoutClick}>Logout</a></li>
               </ul>
             </div>

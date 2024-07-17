@@ -4,7 +4,7 @@ import { useDispatch } from 'react-redux';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 import { baseurl } from '../../baseurl/baseurl';
-import { setUser } from '../../userSlice'; // Adjust the import path as necessary
+import { setUser } from '../../userSlice';
 
 export default function SignIn() {
   const [email, setEmail] = useState('');
@@ -21,18 +21,13 @@ export default function SignIn() {
         password,
       });
 
-      // Set cookie with token, expires in 1 day
       Cookies.set('token', response.data.token, { expires: 1 });
       const userRole = response.data.role;
       const userName = response.data.username;
       const userID = response.data.userId;
 
-      // Dispatch the setUser action
       dispatch(setUser({ id: userID, role: userRole, name: userName }));
 
-      console.log('User role:', userRole, 'User name:', userName, 'User id:', userID);
-
-      // Redirect based on role
       if (userRole === 'admin') {
         navigate('/admin');
       } else {
@@ -40,13 +35,7 @@ export default function SignIn() {
       }
     } catch (error) {
       if (error.response) {
-        if (error.response.status === 404) {
-          setErrorMessage('User not found');
-        } else if (error.response.status === 401) {
-          setErrorMessage('Wrong password');
-        } else {
-          setErrorMessage('Error signing in');
-        }
+        setErrorMessage(error.response.data.message);
       } else {
         setErrorMessage('Error signing in');
       }
